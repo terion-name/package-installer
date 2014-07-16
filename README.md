@@ -32,7 +32,7 @@ Generating autoload files
 ## Why?
 How do you install a package?
 
-You go to github or packagist or google, search for desired package, see it's full name and available versions, then require it via composer's cli or manually patch `composer.json`, then you search in readme what service providers and facades this package provide and manually copypast them to config. **That's annoying!** Machine must do this.
+You go to github or packagist or google, search for desired package, see it's full name and available versions, then require it via composer's cli or manually patch `composer.json`, then you search in readme what service providers and facades this package provide and manually copypast them to config, then publish configs and assets manually... **That's annoying!** Machine must do this.
 
 And here is the solution.
 
@@ -78,7 +78,7 @@ Select version by number [2]:
 **Default selection is the latest stable version if present.** If no stable present — then `dev-master` is selected.
 
 ### 3. PROFIT!
-Installer will now update `composer.json`, install the package, search for ServiceProviders and Facades and patch `app/config/app.php`. It also respects [Ryan's](https://github.com/rtablada) [package installer](https://github.com/rtablada/package-installer) `provides.json` but still will make the work without it.
+Installer will now update `composer.json`, install the package, search for ServiceProviders and Facades, patch `app/config/app.php` and publish package configs and assets. It also respects [Ryan's](https://github.com/rtablada) [package installer](https://github.com/rtablada/package-installer) `provides.json` but still will make the work without it.
 ```sh
 Your choice: 1.2.6
 ./composer.json has been updated
