@@ -56,7 +56,7 @@ Search for a package on composer. This will output list of found packages with n
 ```sh
 php artisan package:install yaap/theme
 ```
-This will install `yaap/theme` package. If there is no such package it will fallback to search.
+This will install [yaap/theme](https://github.com/yaapis/Theme) package. If there is no such package it will fallback to search.
 
 ### 2. Select version
 When package selected you will be promted to choose a version from list of availables by number.
