@@ -1,0 +1,27 @@
+{
+    "name": "terion/package-installer",
+    "description": "Automatic package installer for Laravel 4",
+    "keywords": ["package", "laravel", "cli", "tool"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Volodymyr Terion Kornilov",
+            "email": "mail@terion.name"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.2.*",
+        "illuminate/console": "4.2.*",
+        "illuminate/filesystem": "4.2.*",
+        "illuminate/config": "4.2.*",
+        "knplabs/packagist-api": "1.1",
+        "nesbot/carbon": "1.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Terion\\PackageInstaller\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
