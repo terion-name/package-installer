@@ -317,7 +317,10 @@ class ConfigUpdater
      */
     public function addAlias($alias, $facade)
     {
-        if (array_get($this->getAliases(), $alias)) {
+        if ($facadeCurrent = array_get($this->getAliases(), $alias)) {
+            if ($facadeCurrent === $facade) {
+                return;
+            }
             $this->commentOut($alias, 'aliases');
         }
 
