@@ -153,6 +153,10 @@ class PackageInstallCommand extends Command
                 $this->config->addAlias($alias['alias'], $alias['facade']);
             }
         }
+
+        // publish configs and assets
+        passthru('php artisan config:publish ' . $package->getName());
+        passthru('php artisan asset:publish');
     }
 
     /**
