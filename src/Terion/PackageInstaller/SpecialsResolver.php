@@ -173,6 +173,12 @@ class SpecialsResolver
         }
 
         $pathesToExclude = $this->excludeFilesInPath($basePath);
+        $pathesToExclude = array_map(function($p) use($basePath){
+            return realpath($basePath . DIRECTORY_SEPARATOR . $p);
+        }, $pathesToExclude);
+        $pathesToExclude = array_filter($pathesToExclude, function($p){
+            return $p !== false;
+        });
 
         foreach ($pathes as &$maps) {
             $maps = array_unique(array_values($maps));
@@ -180,9 +186,10 @@ class SpecialsResolver
                 return realpath($basePath . DIRECTORY_SEPARATOR . $p);
             }, $maps);
             foreach ($pathesToExclude as $p) {
-                $pathToExclude = realpath($basePath . DIRECTORY_SEPARATOR . $p);
-                if (($index = array_search($pathToExclude, $maps)) !== false) {
-                    unset($maps[$index]);
+                foreach ($maps as $index => $map) {
+                    if (strpos($map, $p) === 0) {
+                        unset($maps[$index]);
+                    }
                 }
             }
         }
@@ -196,9 +203,12 @@ class SpecialsResolver
      */
     protected function excludeFilesInPath($basePath)
     {
-        $pathes = ['tests/'];
-        if (file_exists($basePath . '/phpunit.xml')) {
-            $xml = simplexml_load_file($basePath . '/phpunit.xml');
+        $pathes = ['tests' . DIRECTORY_SEPARATOR, 'test' . DIRECTORY_SEPARATOR];
+        $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml';
+        if (!file_exists($phpUnit)) $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml.dist';
+
+        if ($phpUnit) {
+            $xml = simplexml_load_file($basePath . DIRECTORY_SEPARATOR . 'phpunit.xml');
             $suites = $xml->testsuites->testsuite;
             if ($suites) {
                 foreach ($suites as $ts) {
