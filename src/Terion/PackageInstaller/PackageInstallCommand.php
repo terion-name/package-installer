@@ -60,6 +60,7 @@ class PackageInstallCommand extends Command
         $this->packagist = $packagist;
         $this->resolver = $resolver;
         $this->config = $config;
+        gc_enable();
     }
 
     /**
