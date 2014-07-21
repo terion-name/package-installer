@@ -207,8 +207,8 @@ class SpecialsResolver
         $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml';
         if (!file_exists($phpUnit)) $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml.dist';
 
-        if ($phpUnit) {
-            $xml = simplexml_load_file($basePath . DIRECTORY_SEPARATOR . 'phpunit.xml');
+        if (file_exists($phpUnit)) {
+            $xml = simplexml_load_file($phpUnit);
             $suites = $xml->testsuites->testsuite;
             if ($suites) {
                 foreach ($suites as $ts) {
