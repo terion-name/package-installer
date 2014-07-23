@@ -245,7 +245,7 @@ class ConfigUpdater
      */
     protected function isCharInComment($haystack, $charPosition) {
         // check for line comment
-        for ($c = $charPosition; $c >= 0; --$c) {
+        for ($c = $charPosition; $c > 0; --$c) {
             if ($haystack[$c] === PHP_EOL) {
                 break;
             }
@@ -256,7 +256,7 @@ class ConfigUpdater
         // check for block comment
         $openingsCount = 0;
         $closingsCount = 0;
-        for ($c = $charPosition; $c >= 0; --$c) {
+        for ($c = $charPosition; $c > 0; --$c) {
             if ($haystack[$c] === '*' and $haystack[$c-1] === '/') {
                 ++$openingsCount;
             }
