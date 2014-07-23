@@ -9,6 +9,7 @@ use Packagist\Api\Result\Package\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
+use Exception;
 
 /**
  * Class PackageInstallCommand
@@ -156,8 +157,19 @@ class PackageInstallCommand extends Command
         }
 
         // publish configs and assets
-        passthru('php artisan config:publish ' . $package->getName());
-        passthru('php artisan asset:publish');
+        try {
+            $this->call('config:publish', array('package' => $package->getName()));
+        }
+        catch(Exception $e) {
+            $this->comment($e->getMessage());
+        }
+        try {
+            $this->call('asset:publish', array('package' => $package->getName()));
+        }
+        catch (Exception $e) {
+            $this->comment($e->getMessage());
+        }
+
     }
 
     /**
