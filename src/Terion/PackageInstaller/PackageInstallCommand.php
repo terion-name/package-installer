@@ -38,7 +38,7 @@ class PackageInstallCommand extends Command
     /**
      * Packagist Api Client object.
      *
-     * @var \Packagist\Api\Client
+     * @var Client
      */
     private $packagist;
     /**
@@ -175,7 +175,7 @@ class PackageInstallCommand extends Command
     }
 
     /**
-     * Promt for package version to install (select from list).
+     * Ask for package version to install (select from list).
      *
      * @param Package $package
      *

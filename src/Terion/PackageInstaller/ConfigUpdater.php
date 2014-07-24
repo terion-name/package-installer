@@ -30,7 +30,7 @@ class ConfigUpdater
     /**
      * Filesystem object.
      *
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var Filesystem
      */
     protected $file;
     /**
@@ -46,7 +46,7 @@ class ConfigUpdater
      */
     protected $defaultSeparator = ",\r\n		";
     /**
-     * @var \Illuminate\Foundation\Application
+     * @var Application
      */
     private $app;
 

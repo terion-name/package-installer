@@ -19,7 +19,7 @@ class SpecialsResolver
 {
 
     /**
-     * @var \Symfony\Component\Finder\Finder
+     * @var Finder
      */
     private $finder;
     /**
