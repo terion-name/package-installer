@@ -56,10 +56,10 @@ class ConfigUpdater
      */
     public function __construct(Filesystem $filesystem, Application $app)
     {
-        $this->$app = $app;
-        $this->env = $this->$_app->environment();
+        $this->app = $app;
+        $this->env = $this->app->environment();
         $this->file = $filesystem;
-        $this->configFile = $this->$_app['path'] . '/config/app.php';
+        $this->configFile = $this->app['path'] . '/config/app.php';
 
         /*
         Adding environment-specific packages has some nuances
