@@ -1,6 +1,7 @@
 <?php namespace Terion\PackageInstaller;
 
 use Carbon\Carbon;
+use Exception;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Illuminate\Console\Command;
 use Packagist\Api\Client;
@@ -9,11 +10,14 @@ use Packagist\Api\Result\Package\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
-use Exception;
 
 /**
  * Class PackageInstallCommand
- * @package Terion\PackageInstaller
+ *
+ * @package  Terion\PackageInstaller
+ * @author   Volodymyr Kornilov <mail@terion.name>
+ * @license  MIT http://opensource.org/licenses/MIT
+ * @link     http://terion.name
  */
 class PackageInstallCommand extends Command
 {
@@ -51,9 +55,9 @@ class PackageInstallCommand extends Command
     private $config;
 
     /**
-     * @param Client $packagist
+     * @param Client           $packagist
      * @param SpecialsResolver $resolver
-     * @param ConfigUpdater $config
+     * @param ConfigUpdater    $config
      */
     public function __construct(Client $packagist, SpecialsResolver $resolver, ConfigUpdater $config)
     {
@@ -159,14 +163,12 @@ class PackageInstallCommand extends Command
         // publish configs and assets
         try {
             $this->call('config:publish', array('package' => $package->getName()));
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             $this->comment($e->getMessage());
         }
         try {
             $this->call('asset:publish', array('package' => $package->getName()));
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->comment($e->getMessage());
         }
 
@@ -176,6 +178,7 @@ class PackageInstallCommand extends Command
      * Promt for package version to install (select from list).
      *
      * @param Package $package
+     *
      * @return mixed
      */
     protected function chooseVersion(Package $package)
@@ -196,7 +199,9 @@ class PackageInstallCommand extends Command
         foreach ($versions as $version) {
             $v = $version->getVersion();
             $versionsAvailable[$i] = $v;
-            if ($v === $latest) $default = $i;
+            if ($v === $latest) {
+                $default = $i;
+            }
 
             $this->getOutput()->writeln(sprintf(
                 '[%d] <info>%s</info> (%s)',
@@ -223,9 +228,10 @@ class PackageInstallCommand extends Command
      * Detect latest stable version of chosen package.
      *
      * @param Package $package
+     *
      * @return mixed|string
      */
-    protected function  getLatestStable(Package $package)
+    protected function getLatestStable(Package $package)
     {
         $version = 'dev-master';
         $stableVersions = array();
@@ -243,7 +249,7 @@ class PackageInstallCommand extends Command
     }
 
     /**
-     * Perform search on packagist and promt oackage select.
+     * Perform search on packagist and ask package select.
      *
      * @param $packageName
      */
@@ -271,7 +277,7 @@ class PackageInstallCommand extends Command
     }
 
     /**
-     * Promt package select from a list.
+     * Ask package select from a list.
      *
      * @param $packages
      */

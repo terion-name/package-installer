@@ -2,6 +2,14 @@
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class PackageInstallerServiceProvider
+ *
+ * @package  Terion\PackageInstaller
+ * @author   Volodymyr Kornilov <mail@terion.name>
+ * @license  MIT http://opensource.org/licenses/MIT
+ * @link     http://terion.name
+ */
 class PackageInstallerServiceProvider extends ServiceProvider
 {
 
@@ -34,6 +42,9 @@ class PackageInstallerServiceProvider extends ServiceProvider
 
     }
 
+    /**
+     * Register commands in artisan
+     */
     protected function registerCommands()
     {
         $this->commands('package.install');
@@ -49,6 +60,9 @@ class PackageInstallerServiceProvider extends ServiceProvider
         return array();
     }
 
+    /**
+     * Bind command to IoC
+     */
     protected function bindInstallCommand()
     {
         $this->app['package.install'] = $this->app->share(function ($app) {

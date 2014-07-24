@@ -2,14 +2,18 @@
 
 namespace Terion\PackageInstaller;
 
-use Packagist\Api\Result\Package;
 use Packagist\Api\Result\Package\Version;
+use Packagist\Api\Result\Package;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
 /**
  * Class SpecialsResolver
- * @package Terion\PackageInstaller
+ *
+ * @package  Terion\PackageInstaller
+ * @author   Volodymyr Kornilov <mail@terion.name>
+ * @license  MIT http://opensource.org/licenses/MIT
+ * @link     http://terion.name
  */
 class SpecialsResolver
 {
@@ -26,7 +30,7 @@ class SpecialsResolver
     /**
      * @param Finder $finder
      */
-    function __construct(Finder $finder)
+    public function __construct(Finder $finder)
     {
         $this->finder = $finder;
     }
@@ -34,6 +38,7 @@ class SpecialsResolver
     /**
      * @param Package $package
      * @param Version $version
+     *
      * @return array|bool
      */
     public function specials(Package $package, Version $version)
@@ -53,6 +58,7 @@ class SpecialsResolver
 
     /**
      * @param Package $package
+     *
      * @return array|bool
      */
     protected function searchProvides(Package $package)
@@ -75,6 +81,7 @@ class SpecialsResolver
     /**
      * @param Package $package
      * @param Version $version
+     *
      * @return array
      */
     protected function searchReflect(Package $package, Version $version)
@@ -94,7 +101,7 @@ class SpecialsResolver
                     $aliases[] = array(
                         'alias' => class_basename($class),
                         'facade' => $class
-                    );;
+                    );
                 }
             }
         }
@@ -104,6 +111,7 @@ class SpecialsResolver
     /**
      * @param Package $package
      * @param Version $version
+     *
      * @return array
      */
     protected function getNamespaces(Package $package, Version $version)
@@ -130,62 +138,67 @@ class SpecialsResolver
     {
         $autoload = $version->getAutoload();
         $this->finder->files()->name('*.php');
-        $pathesToLoad = $this->getLoadPackagePathes($package, $version);
-        foreach ($pathesToLoad['directories'] as $path) {
+        $pathsToLoad = $this->getLoadPackagePathes($package, $version);
+        foreach ($pathsToLoad['directories'] as $path) {
             $this->finder->in($path);
         }
-        foreach ($this->finder as $file) include_once $file->getRealpath();
-        foreach ($pathesToLoad['files'] as $file) include_once $file;
+        foreach ($this->finder as $file) {
+            include_once $file->getRealpath();
+        }
+        foreach ($pathsToLoad['files'] as $file) {
+            include_once $file;
+        }
     }
 
     /**
      * @param Package $package
      * @param Version $version
+     *
      * @return array
      */
     protected function getLoadPackagePathes(Package $package, Version $version)
     {
         $basePath = 'vendor' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, explode('/', $package->getName()));
-        $pathes = array('directories' => array(), 'files' => array());
+        $paths = array('directories' => array(), 'files' => array());
         foreach ($version->getAutoload() as $type => $map) {
             switch ($type) {
                 case 'classmap':
-                    $pathes['directories'] = array_merge($pathes['directories'], (array)$map);
+                    $paths['directories'] = array_merge($paths['directories'], (array)$map);
                     break;
                 case 'psr-0':
                     foreach ($map as $ns => $src) {
                         $nsPath = implode(DIRECTORY_SEPARATOR, explode('\\', str_replace('\\\\', '\\', $ns)));
                         foreach ((array)$src as $path) {
-                            $pathes['directories'][] = rtrim($path, '/') . DIRECTORY_SEPARATOR . $nsPath;
+                            $paths['directories'][] = rtrim($path, '/') . DIRECTORY_SEPARATOR . $nsPath;
                         }
                     }
                     break;
                 case 'psr-4':
                     foreach ($map as $ns => $src) {
                         foreach ((array)$src as $path) {
-                            $pathes['directories'][] = implode(DIRECTORY_SEPARATOR, explode('/', rtrim($path, '/')));
+                            $paths['directories'][] = implode(DIRECTORY_SEPARATOR, explode('/', rtrim($path, '/')));
                         }
                     }
                     break;
                 case 'files':
-                    $pathes['files'] = array_merge($pathes['files'], (array)$map);
+                    $paths['files'] = array_merge($paths['files'], (array)$map);
             }
         }
 
-        $pathesToExclude = $this->excludeFilesInPath($basePath);
-        $pathesToExclude = array_map(function($p) use($basePath){
+        $pathsToExclude = $this->excludeFilesInPath($basePath);
+        $pathsToExclude = array_map(function ($p) use ($basePath) {
             return realpath($basePath . DIRECTORY_SEPARATOR . $p);
-        }, $pathesToExclude);
-        $pathesToExclude = array_filter($pathesToExclude, function($p){
+        }, $pathsToExclude);
+        $pathsToExclude = array_filter($pathsToExclude, function ($p) {
             return $p !== false;
         });
 
-        foreach ($pathes as &$maps) {
+        foreach ($paths as &$maps) {
             $maps = array_unique(array_values($maps));
             $maps = array_map(function ($p) use ($basePath) {
                 return realpath($basePath . DIRECTORY_SEPARATOR . $p);
             }, $maps);
-            foreach ($pathesToExclude as $p) {
+            foreach ($pathsToExclude as $p) {
                 foreach ($maps as $index => $map) {
                     if (strpos($map, $p) === 0) {
                         unset($maps[$index]);
@@ -194,33 +207,37 @@ class SpecialsResolver
             }
         }
 
-        return $pathes;
+        return $paths;
     }
 
     /**
      * @param $basePath
+     *
      * @return array
      */
     protected function excludeFilesInPath($basePath)
     {
-        $pathes = ['tests' . DIRECTORY_SEPARATOR, 'test' . DIRECTORY_SEPARATOR];
+        $paths = ['tests' . DIRECTORY_SEPARATOR, 'test' . DIRECTORY_SEPARATOR];
         $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml';
-        if (!file_exists($phpUnit)) $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml.dist';
+        if (!file_exists($phpUnit)) {
+            $phpUnit = $basePath . DIRECTORY_SEPARATOR . 'phpunit.xml.dist';
+        }
 
         if (file_exists($phpUnit)) {
             $xml = simplexml_load_file($phpUnit);
             $suites = $xml->testsuites->testsuite;
             if ($suites) {
                 foreach ($suites as $ts) {
-                    $pathes[] = $ts->directory;
+                    $paths[] = $ts->directory;
                 }
             }
         }
-        return array_unique($pathes);
+        return array_unique($paths);
     }
 
     /**
      * @param array $namespaces
+     *
      * @return array
      */
     protected function listPackageClasses(array $namespaces)

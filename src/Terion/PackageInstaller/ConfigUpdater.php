@@ -1,12 +1,16 @@
 <?php namespace Terion\PackageInstaller;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Symfony\Component\Finder\Finder;
 
 /**
  * Class ConfigUpdater
- * @package Terion\PackageInstaller
+ *
+ * @package  Terion\PackageInstaller
+ * @author   Volodymyr Kornilov <mail@terion.name>
+ * @license  MIT http://opensource.org/licenses/MIT
+ * @link     http://terion.name
  */
 class ConfigUpdater
 {
@@ -20,7 +24,7 @@ class ConfigUpdater
     /**
      * Working environment.
      *
-     * @var
+     * @var string
      */
     protected $env;
     /**
@@ -37,27 +41,25 @@ class ConfigUpdater
     protected $defaultQuoteType = "'";
     /**
      * Default separator between config items.
-     * With EOL!
      *
      * @var string
      */
-    protected $defaultSeparator = ",
-		";
+    protected $defaultSeparator = ",\r\n		";
     /**
      * @var \Illuminate\Foundation\Application
      */
     private $app;
 
     /**
-     * @param Filesystem $filesystem
-     * @param \Illuminate\Foundation\Application $app
+     * @param Filesystem  $filesystem
+     * @param Application $app
      */
-    function __construct(Filesystem $filesystem, Application $app)
+    public function __construct(Filesystem $filesystem, Application $app)
     {
-        $this->app = $app;
-        $this->env = $this->app->environment();
+        $this->$app = $app;
+        $this->env = $this->$_app->environment();
         $this->file = $filesystem;
-        $this->configFile = $this->app['path'] . '/config/app.php';
+        $this->configFile = $this->$_app['path'] . '/config/app.php';
 
         /*
         Adding environment-specific packages has some nuances
@@ -122,6 +124,7 @@ class ConfigUpdater
      * Detect quote type used in selected config item (providers, aliases).
      *
      * @param $item
+     *
      * @return string
      */
     protected function getQuoteType($item)
@@ -141,6 +144,7 @@ class ConfigUpdater
      * Get bite bounds of selected config item (providers, aliases) in file.
      *
      * @param $item
+     *
      * @return array
      */
     protected function getConfigItemBounds($item)
@@ -175,6 +179,7 @@ class ConfigUpdater
      * Detect config items separator used in selected config item (providers, aliases).
      *
      * @param $item
+     *
      * @return string
      */
     protected function getArrayItemsSeparator($item)
@@ -216,6 +221,7 @@ class ConfigUpdater
      * Detect point where to insert new data for selected config item (providers, aliases).
      *
      * @param $for
+     *
      * @return array
      */
     protected function getInsertPoint($for)
@@ -241,15 +247,18 @@ class ConfigUpdater
      *
      * @param $haystack
      * @param $charPosition
+     *
      * @return bool
      */
-    protected function isCharInComment($haystack, $charPosition) {
+    protected function isCharInComment($haystack, $charPosition)
+    {
         // check for line comment
         for ($c = $charPosition; $c > 0; --$c) {
             if ($haystack[$c] === PHP_EOL) {
                 break;
-            }
-            elseif ($haystack[$c] === '#' or ($haystack[$c] === '/' and ($haystack[$c+1] === '/' or $haystack[$c-1] === '/'))) {
+            } elseif ($haystack[$c] === '#' or ($haystack[$c] === '/'
+                    and ($haystack[$c + 1] === '/' or $haystack[$c - 1] === '/'))
+            ) {
                 return true;
             }
         }
@@ -257,10 +266,10 @@ class ConfigUpdater
         $openingsCount = 0;
         $closingsCount = 0;
         for ($c = $charPosition; $c > 0; --$c) {
-            if ($haystack[$c] === '*' and $haystack[$c-1] === '/') {
+            if ($haystack[$c] === '*' and $haystack[$c - 1] === '/') {
                 ++$openingsCount;
             }
-            if ($haystack[$c] === '/' and $haystack[$c-1] === '*') {
+            if ($haystack[$c] === '/' and $haystack[$c - 1] === '*') {
                 ++$closingsCount;
             }
         }
@@ -339,12 +348,18 @@ class ConfigUpdater
      * @param $search
      * @param $from
      */
-    protected function commentOut($search, $from) {
+    protected function commentOut($search, $from)
+    {
         $bounds = $this->getConfigItemBounds($from);
         $file = $this->getFileContents();
         $cutted = substr($file, 0, $bounds[1]);
 
-        preg_match_all('/[\'"]' . preg_quote($search) . '[\'"]/', $cutted, $matchFacade, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all(
+            '/[\'"]' . preg_quote($search) . '[\'"]/',
+            $cutted,
+            $matchFacade,
+            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
+        );
         foreach ($matchFacade as $match) {
             if (!$this->isCharInComment($cutted, $match[0][1])) {
                 $commentFrom = $match[0][1];
@@ -353,8 +368,8 @@ class ConfigUpdater
                     $comma = strpos($cutted, ',', $comma);
                 }
                 $commentTill = $comma + 1;
-                $this->write('*/', ['position'=>$commentTill, 'symbol'=>'']);
-                $this->write('/*', ['position'=>$commentFrom, 'symbol'=>'']);
+                $this->write('*/', ['position' => $commentTill, 'symbol' => '']);
+                $this->write('/*', ['position' => $commentFrom, 'symbol' => '']);
             }
         }
     }
