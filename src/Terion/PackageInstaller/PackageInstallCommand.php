@@ -119,59 +119,13 @@ class PackageInstallCommand extends Command
         $this->comment('Package ' . $package->getName() . ' installed');
         $versions = $package->getVersions();
         $v = array_get($versions, $version);
-        $this->postProcess($package, $v);
-    }
 
-    /**
-     * Process package after install
-     * e.g. search and register ServiceProviders and Facades.
-     *
-     * @param Package $package
-     * @param Version $version
-     */
-    protected function postProcess(Package $package, Version $version)
-    {
-        $this->comment('Processing package...');
-
-        $specials = $this->resolver->specials($package, $version);
-
-        if ($specials === false) {
-            $this->info("No Service Providers and Facades found. Assuming that package is not designed for Laravel");
-            $this->info('Finishing');
-            exit;
-        }
-
-        if ($this->resolver->isProvidesJsonDetected()) {
-            $this->comment('provides.json detected');
-        }
-
-        if (count($specials['providers'])) {
-            $this->comment('Found ' . count($specials['providers']) . ' service providers:');
-            foreach ($specials['providers'] as $i => $p) {
-                $this->info("[" . ($i + 1) . "] {$p}");
-                $this->config->addProvider($p);
-            }
-        }
-        if (count($specials['aliases'])) {
-            $this->comment('Found ' . count($specials['aliases']) . ' aliases:');
-            foreach ($specials['aliases'] as $i => $alias) {
-                $this->info("[" . ($i + 1) . "] {$alias['facade']} [{$alias['alias']}]");
-                $this->config->addAlias($alias['alias'], $alias['facade']);
-            }
-        }
-
-        // publish configs and assets
-        try {
-            $this->call('config:publish', array('package' => $package->getName()));
-        } catch (Exception $e) {
-            $this->comment($e->getMessage());
-        }
-        try {
-            $this->call('asset:publish', array('package' => $package->getName()));
-        } catch (Exception $e) {
-            $this->comment($e->getMessage());
-        }
-
+        // Run post-process in separate command to load it with new autoloader
+        passthru(sprintf(
+            'php artisan package:process %s %s',
+            $package->getName(),
+            base64_encode(serialize($v))
+        ));
     }
 
     /**
@@ -255,6 +209,7 @@ class PackageInstallCommand extends Command
      */
     protected function searchPackage($packageName)
     {
+        $this->comment('Searching for package...');
         $packages = $this->packagist->search($packageName);
         $total = count($packages);
 

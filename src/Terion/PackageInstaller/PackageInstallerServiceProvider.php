@@ -48,6 +48,7 @@ class PackageInstallerServiceProvider extends ServiceProvider
     protected function registerCommands()
     {
         $this->commands('package.install');
+        $this->commands('package.process');
     }
 
     /**
@@ -67,6 +68,9 @@ class PackageInstallerServiceProvider extends ServiceProvider
     {
         $this->app['package.install'] = $this->app->share(function ($app) {
             return $app->make('Terion\PackageInstaller\PackageInstallCommand');
+        });
+        $this->app['package.process'] = $this->app->share(function ($app) {
+            return $app->make('Terion\PackageInstaller\PackageProcessCommand');
         });
     }
 

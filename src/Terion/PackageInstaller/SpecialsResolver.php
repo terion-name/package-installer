@@ -2,8 +2,8 @@
 
 namespace Terion\PackageInstaller;
 
-use Packagist\Api\Result\Package\Version;
 use Packagist\Api\Result\Package;
+use Packagist\Api\Result\Package\Version;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
@@ -36,12 +36,12 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
-     * @param Version $version
+     * @param Package|string $package
+     * @param Version        $version
      *
      * @return array|bool
      */
-    public function specials(Package $package, Version $version)
+    public function specials($package, Version $version)
     {
         $specials = $this->searchProvides($package);
         if ($specials) {
@@ -57,13 +57,14 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
+     * @param Package|string $package
      *
      * @return array|bool
      */
-    protected function searchProvides(Package $package)
+    protected function searchProvides($package)
     {
-        $providesJsonLocation = base_path("vendor/{$package->getName()}/provides.json");
+        $packageName = $package instanceof Package ? $package->getName() : $package;
+        $providesJsonLocation = base_path("vendor/{$packageName}/provides.json");
         if (file_exists($providesJsonLocation)) {
             $provides = json_decode(str_replace('\\', '\\\\', file_get_contents($providesJsonLocation)), true);
             $return = array('providers' => array(), 'aliases' => array());
@@ -79,12 +80,12 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
-     * @param Version $version
+     * @param Package|string $package
+     * @param Version        $version
      *
      * @return array
      */
-    protected function searchReflect(Package $package, Version $version)
+    protected function searchReflect($package, Version $version)
     {
         $namespaces = $this->getNamespaces($package, $version);
         $this->loadPackageClasses($package, $version);
@@ -109,12 +110,12 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
-     * @param Version $version
+     * @param Package|string $package
+     * @param Version        $version
      *
      * @return array
      */
-    protected function getNamespaces(Package $package, Version $version)
+    protected function getNamespaces($package, Version $version)
     {
         $autoload = $version->getAutoload();
         $namespaces = array();
@@ -131,10 +132,10 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
-     * @param Version $version
+     * @param Package|string $package
+     * @param Version        $version
      */
-    protected function loadPackageClasses(Package $package, Version $version)
+    protected function loadPackageClasses($package, Version $version)
     {
         $autoload = $version->getAutoload();
         $this->finder->files()->name('*.php');
@@ -151,14 +152,15 @@ class SpecialsResolver
     }
 
     /**
-     * @param Package $package
-     * @param Version $version
+     * @param Package|string $package
+     * @param Version        $version
      *
      * @return array
      */
-    protected function getLoadPackagePathes(Package $package, Version $version)
+    protected function getLoadPackagePathes($package, Version $version)
     {
-        $basePath = 'vendor' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, explode('/', $package->getName()));
+        $packageName = $package instanceof Package ? $package->getName() : $package;
+        $basePath = 'vendor' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, explode('/', $packageName));
         $paths = array('directories' => array(), 'files' => array());
         foreach ($version->getAutoload() as $type => $map) {
             switch ($type) {
