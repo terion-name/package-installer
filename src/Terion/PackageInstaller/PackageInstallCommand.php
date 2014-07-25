@@ -193,9 +193,7 @@ class PackageInstallCommand extends Command
             }
         }
         usort($stableVersions, function ($a, $b) {
-            $a = intval(preg_replace('/[^0-9]/', '', $a));
-            $b = intval(preg_replace('/[^0-9]/', '', $b));
-            return ($a < $b) ? 1 : -1;
+            return (version_compare($a, $b, '<')) ? 1 : -1;
         });
         if (count($stableVersions) > 0) {
             $version = array_shift($stableVersions);
