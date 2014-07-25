@@ -2,8 +2,8 @@
 
 namespace Terion\PackageInstaller;
 
-use Packagist\Api\Result\Package;
 use Packagist\Api\Result\Package\Version;
+use Packagist\Api\Result\Package;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
@@ -144,11 +144,34 @@ class SpecialsResolver
             $this->finder->in($path);
         }
         foreach ($this->finder as $file) {
-            include_once $file->getRealpath();
+            if ($this->testFile($path = $file->getRealpath())) {
+                include_once $path;
+            }
         }
         foreach ($pathsToLoad['files'] as $file) {
-            include_once $file;
+            if ($this->testFile($file)) {
+                include_once $file;
+            }
         }
+    }
+
+    /**
+     * Test, is it safe to include a file.
+     * Yes, it is extremely slow, but it is a working method and speed is not critical in this case.
+     *
+     * @param $path
+     *
+     * @return bool
+     */
+    protected function testFile($path)
+    {
+        $autoloader = base_path('vendor/autoload.php');
+        exec(
+            'php -r "require_once \"' . $autoloader . '\"; require_once \"' . $path . '\";" 2> /dev/null',
+            $output,
+            $status
+        );
+        return $status === 0;
     }
 
     /**
