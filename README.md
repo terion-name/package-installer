@@ -1,33 +1,13 @@
 # Ultimate Package Installer
 
-![status:beta](http://img.shields.io/badge/status-beta-yellow.svg)
+![status:beta](http://img.shields.io/badge/status-release_candidate-yellowgreen.svg) 
 ![license:mit](http://img.shields.io/packagist/l/doctrine/orm.svg)
 
 This package provides a cli interface for fast and easy package install (any package, not only laravel-specific).
 
-Example: type `php artisan package:install illuminage` and hit `enter` twice will install latest stable version of [anahkiasen/illuminage](https://github.com/Anahkiasen/illuminage), add ServiceProviders and Aliases.
-```sh
-$ php artisan package:install illuminage
-Found 1 packages:
-[1] anahkiasen/illuminage (Wrapper for the Imagine library to hook into the Laravel framework)
-Select package by number [1]:
-Your choice: anahkiasen/illuminage
-Package to install: anahkiasen/illuminage (Wrapper for the Imagine library to hook into the Laravel framework)
-Available versions:
-[1] dev-develop (2014-04-10 16:39:55)
-[2] dev-master (2014-04-09 18:57:37)
-[3] 1.2.1 (2014-04-09 18:57:37)
-[4] 1.2.0 (2014-01-14 12:08:52)
-[5] 1.1.0 (2013-11-06 01:00:03)
-[6] 1.0.0 (2013-03-27 11:34:38)
-Select version by number [3]:
-Your choice: 1.2.1
-./composer.json has been updated
-Loading composer repositories with package information
-Updating dependencies (including require-dev)
-Nothing to install or update
-Generating autoload files
-```
+Example:
+
+![php artisan package:install barryvdh/laravel-dompdf](http://i.imgur.com/KJmcUyH.png)
 
 ## Why?
 How do you install a package?
@@ -97,6 +77,14 @@ Found 1 service providers:
 Found 1 aliases:
 [1] YAAP\Theme\Facades\Theme [Theme]
 ```
+
+## What problems can you face with
+The only problem that I've discovered is that some packages contain facades, that shouldn't be included in app config,
+but they do and this can break application and should be manually fixed (but this is very easy).
+
+As an example — `orchestra/support` contains about 20 facades and they collide with Laravel facades.
+Package Installer handles this safely by commenting colliding aliases
+so in such case you should manually remove redundant aliases and uncomment old ones. 
 
 ## TODO:
 * Fully automatic (silent) mode
