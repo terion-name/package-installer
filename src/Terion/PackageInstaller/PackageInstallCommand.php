@@ -1,12 +1,10 @@
 <?php namespace Terion\PackageInstaller;
 
 use Carbon\Carbon;
-use Exception;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Illuminate\Console\Command;
 use Packagist\Api\Client;
 use Packagist\Api\Result\Package;
-use Packagist\Api\Result\Package\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
@@ -190,11 +188,15 @@ class PackageInstallCommand extends Command
         $version = 'dev-master';
         $stableVersions = array();
         foreach ($package->getVersions() as $v) {
-            if (strpos($v->getVersion(), 'dev-') !== 0) {
+            if (!str_contains(strtolower($v->getVersion()), ['dev', 'beta', 'alpha', 'b', 'a'])) {
                 $stableVersions[] = $v->getVersion();
             }
         }
-        rsort($stableVersions);
+        usort($stableVersions, function ($a, $b) {
+            $a = intval(preg_replace('/[^0-9]/', '', $a));
+            $b = intval(preg_replace('/[^0-9]/', '', $b));
+            return ($a < $b) ? 1 : -1;
+        });
         if (count($stableVersions) > 0) {
             $version = array_shift($stableVersions);
         }
