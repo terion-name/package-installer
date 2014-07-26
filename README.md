@@ -20,7 +20,7 @@ And here is the solution.
 ## Installation
 1. Require package:
 ```
-composer require terion/package-installer:dev-master
+composer require terion/package-installer:~1
 ```
 2. Add to `app/config/app.php` to `providers` array:
 ```
