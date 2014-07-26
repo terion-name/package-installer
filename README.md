@@ -1,7 +1,8 @@
 # Ultimate Package Installer
 
-![status:beta](http://img.shields.io/badge/status-release_candidate-yellowgreen.svg) 
-![license:mit](http://img.shields.io/packagist/l/doctrine/orm.svg)
+[![version](http://img.shields.io/packagist/v/terion/package-installer.svg)](https://packagist.org/packages/terion/package-installer)
+![license](http://img.shields.io/packagist/l/terion/package-installer.svg)
+![downloads](http://img.shields.io/packagist/dt/terion/package-installer.svg)
 
 This package provides a cli interface for fast and easy package install (any package, not only laravel-specific).
 
@@ -89,6 +90,5 @@ so in such case you should manually remove redundant aliases and uncomment old o
 ## TODO:
 * Fully automatic (silent) mode
 * Passthrough parameters to composer cli
-* Test with most popular packages
 * Deal with environment-specific packages
 * Unittesting
