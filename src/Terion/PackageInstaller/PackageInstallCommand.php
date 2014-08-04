@@ -193,7 +193,7 @@ class PackageInstallCommand extends Command
             }
         }
         usort($stableVersions, function ($a, $b) {
-            return (version_compare($a, $b, '<')) ? 1 : -1;
+            return (version_compare(ltrim($a, 'v'), ltrim($b, 'v'), '<')) ? 1 : -1;
         });
         if (count($stableVersions) > 0) {
             $version = array_shift($stableVersions);
